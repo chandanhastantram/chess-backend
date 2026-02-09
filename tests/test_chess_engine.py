@@ -10,7 +10,7 @@ def test_initial_position():
 
 
 def test_legal_move():
-    """Test legal move validation"""
+    """Test legal move validation"""      
     engine = ChessEngine()
     assert engine.is_legal_move("e2e4") is True
     assert engine.is_legal_move("e2e5") is False
