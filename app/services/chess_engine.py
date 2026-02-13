@@ -35,10 +35,9 @@ class ChessEngine:
         """
         move = chess.Move.from_uci(move_uci)
         if move not in self.board.legal_moves:
-            raise ValueError(f"Illegal move: {move_uci}")
-        
-        # Get SAN notation before making the move
-        san = self.board.san(move)
+            raise ValueError(f"Illegal move: {move_uci}")    
+ 
+        san = self.board.san(move) 
         
         # Make the move
         self.board.push(move)
