@@ -26,7 +26,7 @@ class TournamentService:
         # Sort by score (descending), then rating (descending)
         sorted_participants = sorted(
             participants,
-            key=lambda p: (-p['score'], -p['rating'])
+            key=lambda p: (-p['score'], -p['rating'])    
         )
         
         # Group by score
