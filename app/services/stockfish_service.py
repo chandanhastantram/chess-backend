@@ -12,7 +12,7 @@ class StockfishService:
     def __init__(self, stockfish_path: str = None):
         """
         Initialize Stockfish service
-        
+              
         Args:
             stockfish_path: Path to Stockfish executable
         """
@@ -166,7 +166,7 @@ class StockfishService:
         except Exception as e:
             return {
                 "move": move,
-                "is_best": False,
+                "is_best": False,   
                 "evaluation": None,
                 "error": str(e)
             }
