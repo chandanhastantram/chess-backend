@@ -11,6 +11,8 @@ from app.models.rating import Rating, TimeControl
 from app.models.game import Game
 from app.models.friendship import Friendship, FriendshipStatus
 from app.middleware.auth import get_current_user, get_optional_current_user
+from app.services.leveling_service import LevelingService
+from app.websockets.connection_manager import manager
 
 router = APIRouter()
 
@@ -33,6 +35,8 @@ class UserUpdateRequest(BaseModel):
     avatar_url: Optional[str] = None
     country: Optional[str] = None
     bio: Optional[str] = None
+    preferred_board_theme: Optional[str] = None
+    preferred_piece_set: Optional[str] = None
 
 
 class RatingResponse(BaseModel):
@@ -74,11 +78,70 @@ async def update_current_user_profile(
         current_user.country = request.country
     if request.bio is not None:
         current_user.bio = request.bio
+    if request.preferred_board_theme is not None:
+        current_user.preferred_board_theme = request.preferred_board_theme
+    if request.preferred_piece_set is not None:
+        current_user.preferred_piece_set = request.preferred_piece_set
     
     await db.commit()
     await db.refresh(current_user)
     
     return current_user
+
+
+@router.get("/{user_id}/level")
+async def get_user_level(
+    user_id: UUID4,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a user's level, XP, and streak information"""
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    level_info = await LevelingService.get_level_info(user_id, db)
+    return {"user_id": str(user_id), "username": user.username, **level_info}
+
+
+@router.get("/{user_id}/online")
+async def check_user_online(user_id: UUID4):
+    """Check if a user is currently online"""
+    return {"user_id": str(user_id), "is_online": manager.is_online(str(user_id))}
+
+
+@router.get("/me/friends/online")
+async def get_online_friends(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a list of currently online friends"""
+    # Get accepted friendships
+    result = await db.execute(
+        select(Friendship).where(
+            or_(
+                Friendship.user_id == current_user.id,
+                Friendship.friend_id == current_user.id,
+            ),
+            Friendship.status == FriendshipStatus.ACCEPTED,
+        )
+    )
+    friendships = result.scalars().all()
+
+    online_friends = []
+    for f in friendships:
+        friend_id = str(f.friend_id if f.user_id == current_user.id else f.user_id)
+        if manager.is_online(friend_id):
+            friend_result = await db.execute(select(User).where(User.id == friend_id))
+            friend = friend_result.scalar_one_or_none()
+            if friend:
+                online_friends.append({
+                    "user_id": friend_id,
+                    "username": friend.username,
+                    "avatar_url": friend.avatar_url,
+                })
+
+    return {"online_friends": online_friends, "count": len(online_friends)}
 
 
 @router.get("/{user_id}", response_model=UserProfileResponse)

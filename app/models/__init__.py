@@ -6,6 +6,9 @@ from app.models.move import Move
 from app.models.puzzle import Puzzle, PuzzleAttempt
 from app.models.tournament import Tournament, TournamentParticipant, TournamentPairing
 from app.models.friendship import Friendship
+from app.models.player_stats import PlayerStats
+from app.models.game_analysis import GameAnalysis, MoveAnalysis
+from app.models.challenge import Challenge
 
 __all__ = [
     "User",
@@ -18,4 +21,8 @@ __all__ = [
     "TournamentParticipant",
     "TournamentPairing",
     "Friendship",
+    "PlayerStats",
+    "GameAnalysis",
+    "MoveAnalysis",
+    "Challenge",
 ]

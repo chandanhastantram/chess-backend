@@ -213,7 +213,8 @@ async def list_user_games(
 
 @router.get("/live")
 async def list_live_games():
-    """List currently active games"""
+    """List currently active games with spectator counts"""
+    from app.websockets.connection_manager import manager as ws_manager
     active_games = []
     for game_id, game_state in game_manager.games.items():
         if game_state.is_active:
@@ -224,9 +225,21 @@ async def list_live_games():
                 "fen": game_state.engine.get_fen(),
                 "turn": game_state.turn,
                 "move_count": len(game_state.moves),
+                "spectator_count": ws_manager.get_spectator_count(game_id),
             })
     
     return {"games": active_games, "count": len(active_games)}
+
+
+@router.get("/{game_id}/spectators")
+async def get_game_spectators(game_id: UUID4):
+    """Get the number of spectators watching a game"""
+    from app.websockets.connection_manager import manager as ws_manager
+    return {
+        "game_id": str(game_id),
+        "spectator_count": ws_manager.get_spectator_count(str(game_id)),
+        "spectator_ids": list(ws_manager.get_spectators(str(game_id))),
+    }
 
 
 @router.post("/{game_id}/complete")

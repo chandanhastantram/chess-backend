@@ -3,12 +3,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import timedelta
+from pydantic import BaseModel, Field
 from app.database import get_db
 from app.models.user import User
 from app.models.rating import Rating, TimeControl
 from app.schemas import UserCreate, UserLogin, TokenResponse, UserResponse
 from app.utils.auth import verify_password, get_password_hash, create_access_token
 from app.config import settings
+from app.middleware.auth import get_current_user
 
 router = APIRouter()
 
@@ -87,3 +89,48 @@ async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db)):
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Refresh access token.
+    
+    Requires a valid (non-expired) token. Returns a new token
+    with a fresh expiration time.
+    """
+    access_token = create_access_token(
+        data={"sub": str(current_user.id)},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8)
+
+
+@router.post("/change-password")
+async def change_password(
+    request: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Change password for the currently authenticated user.
+    
+    Requires the current password for verification.
+    """
+    if not verify_password(request.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    current_user.password_hash = get_password_hash(request.new_password)
+    await db.commit()
+    
+    return {"message": "Password changed successfully"}

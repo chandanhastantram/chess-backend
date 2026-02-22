@@ -1,5 +1,5 @@
 """Game model"""
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Index, func, ARRAY
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Index, func, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -24,7 +24,7 @@ class Game(Base):
     # Game data
     pgn = Column(Text)
     fen = Column(String(100))
-    moves = Column(ARRAY(String))  # Array of UCI moves
+    moves = Column(JSON)  # Array of UCI moves
     
     # Result
     result = Column(String(10))  # "1-0", "0-1", "1/2-1/2", "*"

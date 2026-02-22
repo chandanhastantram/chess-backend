@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     
     # Environment
     ENVIRONMENT: str = "development"
+    
+    # Rate limiting
+    RATE_LIMIT_PER_MINUTE: int = 100
+    AUTH_RATE_LIMIT_PER_MINUTE: int = 30
     DEBUG: bool = True
     
     class Config:

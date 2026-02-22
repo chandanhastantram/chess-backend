@@ -19,6 +19,10 @@ class User(Base):
     avatar_url = Column(String(500))
     country = Column(String(3))  # ISO 3166-1 alpha-3
     bio = Column(String(500))
+    
+    # Preferences
+    preferred_board_theme = Column(String(50), default="classic")
+    preferred_piece_set = Column(String(50), default="standard")
     title = Column(String(10))  # GM, IM, FM, etc.
     
     # Status

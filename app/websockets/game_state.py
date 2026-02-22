@@ -48,6 +48,85 @@ class GameStateManager:
     def __init__(self):
         self.games: Dict[str, GameState] = {}
         self.clock_tasks: Dict[str, asyncio.Task] = {}
+        self.ticker_task: Optional[asyncio.Task] = None
+        self.broadcast_callback = None
+    
+    def set_broadcast_callback(self, callback):
+        """Set a callback for broadcasting game events"""
+        self.broadcast_callback = callback
+    
+    async def start_ticker(self):
+        """Start the global clock ticker task"""
+        if self.ticker_task is None:
+            self.ticker_task = asyncio.create_task(self._clock_tick_loop())
+    
+    async def stop_ticker(self):
+        """Stop the global clock ticker task"""
+        if self.ticker_task:
+            self.ticker_task.cancel()
+            try:
+                await self.ticker_task
+            except asyncio.CancelledError:
+                pass
+            self.ticker_task = None
+
+    async def _clock_tick_loop(self):
+        """Background loop to update clocks and detect timeouts every second"""
+        while True:
+            try:
+                await asyncio.sleep(1.0)
+                now = datetime.utcnow()
+                
+                # Copy games list to avoid modification during iteration
+                for game_id, game in list(self.games.items()):
+                    if not game.is_active:
+                        continue
+                    
+                    # Deduce time for current turn
+                    elapsed_ms = int((now - game.last_move_time).total_seconds() * 1000)
+                    
+                    current_white_time = game.white_time
+                    current_black_time = game.black_time
+                    
+                    if game.turn == "white":
+                        current_white_time -= elapsed_ms
+                    else:
+                        current_black_time -= elapsed_ms
+                        
+                    # Check for timeout
+                    if current_white_time <= 0 or current_black_time <= 0:
+                        winner_id = game.black_player_id if current_white_time <= 0 else game.white_player_id
+                        winner_color = "black" if current_white_time <= 0 else "white"
+                        result = "0-1" if winner_color == "black" else "1-0"
+                        
+                        game.is_active = False
+                        game.white_time = max(0, current_white_time)
+                        game.black_time = max(0, current_black_time)
+                        
+                        if self.broadcast_callback:
+                            await self.broadcast_callback(game_id, {
+                                "type": "game_over",
+                                "result": result,
+                                "termination": "timeout",
+                                "winner": winner_id,
+                                "white_time": game.white_time,
+                                "black_time": game.black_time,
+                            })
+                    
+                    # Periodic time sync (every tick or every few ticks)
+                    elif self.broadcast_callback:
+                        # We send the "live" remaining time
+                        await self.broadcast_callback(game_id, {
+                            "type": "time_update",
+                            "white_time": max(0, current_white_time),
+                            "black_time": max(0, current_black_time),
+                        })
+                        
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                print(f"Error in clock ticker: {e}")
+                await asyncio.sleep(1.0)
     
     def create_game(
         self,

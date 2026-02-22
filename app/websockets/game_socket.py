@@ -50,10 +50,27 @@ async def game_websocket(websocket: WebSocket, game_id: str, token: str = ""):
     
     # Connect and join game room
     await manager.connect(user_id, websocket)
-    manager.join_game(user_id, game_id)
+    
+    # Determine if user is a player or spectator
+    game = game_manager.get_game(game_id)
+    is_spectator = False
+    if game:
+        player_color = game.get_player_color(user_id)
+        if player_color is None:
+            # User is not a player — join as spectator
+            is_spectator = True
+            manager.add_spectator(user_id, game_id)
+            await manager.broadcast_to_game(game_id, {
+                "type": "spectator_joined",
+                "user_id": user_id,
+                "spectator_count": manager.get_spectator_count(game_id),
+            })
+        else:
+            manager.join_game(user_id, game_id)
+    else:
+        manager.join_game(user_id, game_id)
     
     # Send initial game state if game exists
-    game = game_manager.get_game(game_id)
     if game:
         await manager.send_to_user(user_id, {
             "type": "game_state",
@@ -64,6 +81,8 @@ async def game_websocket(websocket: WebSocket, game_id: str, token: str = ""):
             "moves": game.moves,
             "your_color": game.get_player_color(user_id),
             "is_active": game.is_active,
+            "is_spectator": is_spectator,
+            "spectator_count": manager.get_spectator_count(game_id),
         })
     
     try:
@@ -71,6 +90,14 @@ async def game_websocket(websocket: WebSocket, game_id: str, token: str = ""):
             data = await websocket.receive_text()
             message = json.loads(data)
             event_type = message.get("type")
+            
+            # Block spectator actions (they can only send chat)
+            if is_spectator and event_type in ("move", "resign", "offer_draw", "accept_draw", "decline_draw"):
+                await manager.send_to_user(user_id, {
+                    "type": "error",
+                    "message": "Spectators cannot perform game actions"
+                })
+                continue
             
             if event_type == "move":
                 await handle_move(user_id, game_id, message.get("move"))
@@ -91,7 +118,15 @@ async def game_websocket(websocket: WebSocket, game_id: str, token: str = ""):
                 await handle_chat(user_id, game_id, message.get("message", ""))
             
     except WebSocketDisconnect:
-        manager.leave_game(user_id, game_id)
+        if is_spectator:
+            manager.remove_spectator(user_id, game_id)
+            await manager.broadcast_to_game(game_id, {
+                "type": "spectator_left",
+                "user_id": user_id,
+                "spectator_count": manager.get_spectator_count(game_id),
+            })
+        else:
+            manager.leave_game(user_id, game_id)
         await manager.disconnect(user_id)
         
         # Notify opponent of disconnect

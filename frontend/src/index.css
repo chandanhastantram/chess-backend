@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Roboto:wght@300;400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-surface-100 text-text font-sans antialiased;
+  }
+
+  ::selection {
+    background: #81b64c;
+    color: #fff;
+  }
+}
+
+@layer components {
+  /* Standard chess.com card */
+  .card {
+    @apply bg-surface-300 rounded-md;
+  }
+
+  /* Green CTA button */
+  .btn-primary {
+    @apply bg-accent-green hover:bg-accent-greenHover active:bg-accent-greenDark
+           text-white font-bold rounded-md px-6 py-3 
+           transition-colors duration-150 cursor-pointer select-none;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-400 hover:bg-surface-500 text-text 
+           font-bold rounded-md px-6 py-3 
+           transition-colors duration-150 cursor-pointer select-none;
+  }
+
+  .btn-icon {
+    @apply w-10 h-10 flex items-center justify-center rounded-md
+           bg-surface-400 hover:bg-surface-500 text-text-muted hover:text-text
+           transition-colors duration-150 cursor-pointer;
+  }
+
+  /* Move list */
+  .move-row {
+    @apply flex items-stretch text-sm font-mono;
+  }
+  .move-row:nth-child(odd) {
+    @apply bg-surface-200;
+  }
+  .move-row:nth-child(even) {
+    @apply bg-surface-300;
+  }
+  .move-cell {
+    @apply flex-1 px-3 py-1.5 cursor-pointer hover:bg-surface-400 transition-colors;
+  }
+  .move-num {
+    @apply w-10 text-text-dim text-center py-1.5 flex-shrink-0;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-200;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-500 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-dim;
+  }
+}

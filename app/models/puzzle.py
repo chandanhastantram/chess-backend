@@ -1,5 +1,5 @@
 """Puzzle models"""
-from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, ForeignKey, Text, ARRAY, Index, func
+from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, ForeignKey, Text, JSON, Index, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -14,13 +14,13 @@ class Puzzle(Base):
     
     # Puzzle data
     fen = Column(String(100), nullable=False)  # Starting position
-    moves = Column(ARRAY(String), nullable=False)  # Solution moves in UCI format
+    moves = Column(JSON, nullable=False)  # Solution moves in UCI format
     
     # Difficulty
     rating = Column(Integer, default=1500)
     
     # Themes/tags
-    themes = Column(ARRAY(String))  # e.g., ["fork", "pin", "skewer"]
+    themes = Column(JSON)  # e.g., ["fork", "pin", "skewer"]
     
     # Statistics
     popularity = Column(Integer, default=0)
@@ -35,7 +35,6 @@ class Puzzle(Base):
     # Indexes
     __table_args__ = (
         Index('idx_puzzle_rating', 'rating'),
-        Index('idx_puzzle_themes', 'themes', postgresql_using='gin'),
     )
     
     def __repr__(self):

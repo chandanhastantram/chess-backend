@@ -137,10 +137,15 @@ async def matchmaking_websocket(websocket: WebSocket, token: str = ""):
                 # Create the game
                 game_id = match_id  # Use match_id as game_id for simplicity
                 
-                # Parse time control (e.g., "5+0" -> base=5min, increment=0)
-                # For now, default to 5+0
-                base_time = 5 * 60  # 5 minutes
-                increment = 0
+                # Parse time control from queue entry (e.g., "5+0" -> base=5min, increment=0)
+                queue_entry = matchmaking_service.user_queue.get(player1_id)
+                tc_str = "5+0"
+                if queue_entry:
+                    queue_key = queue_entry
+                    tc_str = queue_key.split("_")[0] if "_" in queue_key else "5+0"
+                tc_parts = tc_str.split("+")
+                base_time = int(tc_parts[0]) * 60      # minutes -> seconds
+                increment = int(tc_parts[1]) if len(tc_parts) > 1 else 0
                 
                 # Create game state
                 game_manager.create_game(
