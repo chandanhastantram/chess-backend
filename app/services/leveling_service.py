@@ -6,7 +6,6 @@ from typing import Optional, Dict
 from app.models.player_stats import PlayerStats
 
 
-# XP rewards per activity
 XP_REWARDS = {
     "win": 25,
     "draw": 10,
