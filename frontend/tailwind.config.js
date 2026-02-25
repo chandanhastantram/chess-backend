@@ -11,8 +11,8 @@ export default {
         board: {
           light: '#ebecd0',   // cream/beige light squares
           dark: '#779556',    // green dark squares
-          selected: '#f6f669', // yellow highlight
-          move: '#baca44',    // legal move highlight
+          selected: '#f6f669', 
+          move: '#baca44',    
           lastLight: '#f6f680',
           lastDark: '#bbcc44',
         },
