@@ -5,7 +5,7 @@ import sys
 import os
 from typing import List
 
-# Add parent directory to path to import app
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database import async_session_maker, init_db
