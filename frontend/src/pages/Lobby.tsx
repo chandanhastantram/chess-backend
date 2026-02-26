@@ -28,15 +28,15 @@ export const Lobby: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen study-vibe pt-24 px-6 max-w-7xl mx-auto pb-12">
+    <div className="min-h-screen pt-24 px-6 max-w-7xl mx-auto pb-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Play Now - Matchmaking Pools */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl italic">Tournament Hall</h2>
+            <h2 className="text-3xl font-bold">Tournament Hall</h2>
             <div className="flex gap-2">
-              <span className="px-3 py-1 bg-chess-success/10 text-chess-success text-[10px] font-bold uppercase tracking-widest rounded-full border border-chess-success/20">
+              <span className="px-3 py-1 bg-accent-green/10 text-accent-green text-[10px] font-bold uppercase tracking-widest rounded-full border border-accent-green/20">
                 1,248 Players Online
               </span>
             </div>
@@ -48,18 +48,18 @@ export const Lobby: React.FC = () => {
               return (
                 <button
                   key={pool.id}
-                  className="glass-card p-6 flex items-center justify-between group hover:border-gold/30 hover:bg-obsidian-hover transition-all text-left"
+                  className="card p-6 flex items-center justify-between group hover:bg-surface-400 hover:-translate-y-1 transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl bg-obsidian border border-white/5 ${pool.color}`}>
+                    <div className={`p-3 rounded-xl bg-surface-200 group-hover:scale-110 transition-transform ${pool.color}`}>
                       <Icon size={24} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold">{pool.label}</h3>
-                      <p className="text-sm text-parchment/40">{pool.time} • Rated</p>
+                      <h3 className="text-lg font-bold group-hover:text-accent-greenHover transition-colors">{pool.label}</h3>
+                      <p className="text-sm text-text-muted">{pool.time} • Rated</p>
                     </div>
                   </div>
-                  <ArrowRight className="text-gold opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                  <ArrowRight className="text-accent-green opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                 </button>
               );
             })}
@@ -67,11 +67,11 @@ export const Lobby: React.FC = () => {
 
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="premium-button flex-1 min-w-[200px] flex items-center justify-center gap-2">
+            <button className="btn-primary flex-1 min-w-[200px] flex items-center justify-center gap-2 text-lg">
               <Swords size={20} />
               Challenge a Friend
             </button>
-            <button className="flex-1 min-w-[200px] flex items-center justify-center gap-2 glass-card p-3 hover:bg-white/5 transition-all font-bold uppercase text-xs tracking-widest">
+            <button className="btn-secondary flex-1 min-w-[200px] flex items-center justify-center gap-2 text-lg">
               Play with AI
             </button>
           </div>
@@ -79,19 +79,19 @@ export const Lobby: React.FC = () => {
 
         {/* Live Games - Spectator View */}
         <div className="space-y-6">
-          <h2 className="text-2xl italic">Watch Live</h2>
+          <h2 className="text-2xl font-bold">Watch Live</h2>
           <div className="space-y-4">
             {activeMatches.length > 0 ? (
               activeMatches.map((match) => (
                 <div 
                   key={match.id}
                   onClick={() => navigate(`/game/${match.id}`)}
-                  className="glass-card p-4 space-y-4 cursor-pointer hover:border-gold/20 hover:bg-obsidian-hover transition-all"
+                  className="card p-4 space-y-4 cursor-pointer hover:bg-surface-400 hover:-translate-y-1 transition-all"
                 >
-                  <div className="flex justify-between items-center text-xs text-parchment/40 uppercase tracking-widest font-bold">
+                  <div className="flex justify-between items-center text-xs text-text-muted uppercase tracking-widest font-bold">
                     <span>{match.time_control}</span>
                     <span className="flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-chess-success" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent-green animate-subtle-pulse" />
                       Live
                     </span>
                   </div>
@@ -99,30 +99,30 @@ export const Lobby: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-2">
-                         <div className="w-6 h-6 rounded bg-white" />
-                         <span className="text-sm font-bold truncate">{match.white_player}</span>
+                         <div className="w-6 h-6 rounded bg-surface-100 flex items-center justify-center text-text-muted text-xs font-bold border border-surface-400">W</div>
+                         <span className="text-sm font-bold truncate group-hover:text-accent-green transition-colors">{match.white_player}</span>
                        </div>
-                       <span className="text-xs opacity-40 italic">2140</span>
+                       <span className="text-xs text-text-dim font-mono">2140</span>
                     </div>
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-2">
-                         <div className="w-6 h-6 rounded bg-neutral-800 border border-white/10" />
-                         <span className="text-sm font-bold truncate">{match.black_player}</span>
+                         <div className="w-6 h-6 rounded bg-surface-100 flex items-center justify-center text-text-muted text-xs font-bold border border-surface-400">B</div>
+                         <span className="text-sm font-bold truncate group-hover:text-accent-green transition-colors">{match.black_player}</span>
                        </div>
-                       <span className="text-xs opacity-40 italic">2155</span>
+                       <span className="text-xs text-text-dim font-mono">2155</span>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-white/5 flex justify-between items-center text-[10px] text-parchment/40">
+                  <div className="pt-2 border-t border-surface-200 flex justify-between items-center text-[10px] text-text-dim">
                     <span>{match.opening_name || 'Chess Variation'}</span>
                     <span>{match.spectators || 0} watching</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="glass-card p-8 text-center space-y-4">
-                <p className="text-sm text-parchment/40 italic">No matches currently in progress</p>
-                <button className="premium-button text-xs py-2">Start a Game</button>
+              <div className="card p-8 text-center space-y-4">
+                <p className="text-sm text-text-muted">No matches currently in progress</p>
+                <button className="btn-primary w-full text-sm !py-2">Start a Game</button>
               </div>
             )}
           </div>

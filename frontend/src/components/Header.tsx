@@ -32,13 +32,13 @@ export const Header = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-bold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-bold transition-all hover:scale-105 active:scale-95 ${
                 isActive
-                  ? 'bg-surface-400 text-text'
+                  ? 'bg-surface-400 text-text shadow-sm'
                   : 'text-text-muted hover:text-text hover:bg-surface-400'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={16} className={isActive ? 'text-accent-green' : ''} />
               <span className="hidden md:inline">{item.label}</span>
             </Link>
           );

@@ -1,83 +1,254 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Roboto:wght@300;400;500;700;900&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ─── Theme: Chess.com Standard Palette ─── */
+@theme {
+  /* Board colors */
+  --color-board-light: #ebecd0;
+  --color-board-dark: #779556;
+  --color-board-selected: #f6f669;
+  --color-board-move: #baca44;
+  --color-board-lastLight: #f6f680;
+  --color-board-lastDark: #bbcc44;
 
+  /* Surface / Background */
+  --color-surface: #312e2b;
+  --color-surface-100: #272421;
+  --color-surface-200: #312e2b;
+  --color-surface-300: #3d3a37;
+  --color-surface-400: #48453f;
+  --color-surface-500: #5c5955;
+
+  /* Text */
+  --color-text: #ededed;
+  --color-text-muted: #a0a0a0;
+  --color-text-dim: #7c7c7c;
+
+  /* Accents */
+  --color-accent-green: #81b64c;
+  --color-accent-greenHover: #a3d160;
+  --color-accent-greenDark: #5a8728;
+  --color-accent-orange: #e58f2a;
+  --color-accent-red: #e02828;
+  --color-accent-yellow: #f0c340;
+
+  /* Eval */
+  --color-eval-brilliant: #1baca6;
+  --color-eval-great: #5c8bb0;
+  --color-eval-best: #96bc4b;
+  --color-eval-good: #96bc4b;
+  --color-eval-inaccuracy: #f0c340;
+  --color-eval-mistake: #e69d00;
+  --color-eval-blunder: #ca3531;
+
+  /* Typography */
+  --font-sans: 'Roboto', 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+  --font-mono: 'Roboto Mono', 'Consolas', monospace;
+
+  /* Border radius */
+  --radius-board: 4px;
+
+  /* Animations */
+  --animate-pop: pop 0.2s ease-out forwards;
+  --animate-subtle-pulse: subtle-pulse 2s infinite;
+  --animate-slide-up: slide-up 0.3s ease-out forwards;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-bounce-in: bounce-in 0.5s ease-out forwards;
+  --animate-fade-in-up: fade-in-up 0.4s ease-out forwards;
+  --animate-scale-in: scale-in 0.3s ease-out forwards;
+  --animate-piece-place: piece-place 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+  /* Keyframes */
+  @keyframes pop {
+    0% { transform: scale(0.95); opacity: 0.5; }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes subtle-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  @keyframes slide-up {
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(129, 182, 76, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(129, 182, 76, 0.4), 0 0 40px rgba(129, 182, 76, 0.1); }
+  }
+  @keyframes bounce-in {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fade-in-up {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes scale-in {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes piece-place {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+}
+
+/* ─── Base ─── */
 :root {
   color-scheme: dark;
 }
 
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    @apply bg-surface-100 text-text font-sans antialiased;
-  }
-
-  ::selection {
-    background: #81b64c;
-    color: #fff;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer components {
-  /* Standard chess.com card */
+body {
+  background-color: var(--color-surface-100);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #81b64c;
+  color: #fff;
+}
+
+/* ─── Component Classes ─── */
   .card {
-    @apply bg-surface-300 rounded-md;
+    background-color: var(--color-surface-300);
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
   }
 
-  /* Green CTA button */
   .btn-primary {
-    @apply bg-accent-green hover:bg-accent-greenHover active:bg-accent-greenDark
-           text-white font-bold rounded-md px-6 py-3 
-           transition-colors duration-150 cursor-pointer select-none;
+    background-color: var(--color-accent-green);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 150ms;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 0 0 #5a8728;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    font-size: inherit;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-accent-greenHover);
+    box-shadow: 0 4px 0 0 #6d9b3a;
+  }
+  .btn-primary:active {
+    background-color: var(--color-accent-greenDark);
+    transform: scale(0.95) translateY(2px);
+    box-shadow: none;
   }
 
   .btn-secondary {
-    @apply bg-surface-400 hover:bg-surface-500 text-text 
-           font-bold rounded-md px-6 py-3 
-           transition-colors duration-150 cursor-pointer select-none;
+    background-color: var(--color-surface-400);
+    color: var(--color-text);
+    font-weight: 700;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 150ms;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 0 0 #312e2b;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    font-size: inherit;
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-surface-500);
+  }
+  .btn-secondary:active {
+    transform: scale(0.95) translateY(2px);
+    box-shadow: none;
   }
 
   .btn-icon {
-    @apply w-10 h-10 flex items-center justify-center rounded-md
-           bg-surface-400 hover:bg-surface-500 text-text-muted hover:text-text
-           transition-colors duration-150 cursor-pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    background-color: var(--color-surface-400);
+    color: var(--color-text-muted);
+    transition: all 150ms;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-icon:hover {
+    background-color: var(--color-surface-500);
+    color: var(--color-text);
+    transform: scale(1.05);
+  }
+  .btn-icon:active {
+    transform: scale(0.95);
   }
 
   /* Move list */
   .move-row {
-    @apply flex items-stretch text-sm font-mono;
+    display: flex;
+    align-items: stretch;
+    font-size: 0.875rem;
+    font-family: var(--font-mono);
   }
   .move-row:nth-child(odd) {
-    @apply bg-surface-200;
+    background-color: var(--color-surface-200);
   }
   .move-row:nth-child(even) {
-    @apply bg-surface-300;
+    background-color: var(--color-surface-300);
   }
   .move-cell {
-    @apply flex-1 px-3 py-1.5 cursor-pointer hover:bg-surface-400 transition-colors;
+    flex: 1;
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 150ms;
+  }
+  .move-cell:hover {
+    background-color: var(--color-surface-400);
   }
   .move-num {
-    @apply w-10 text-text-dim text-center py-1.5 flex-shrink-0;
+    width: 2.5rem;
+    color: var(--color-text-dim);
+    text-align: center;
+    padding: 0.375rem 0;
+    flex-shrink: 0;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-surface-200;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-surface-500 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-text-dim;
-  }
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-200);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-500);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-dim);
 }

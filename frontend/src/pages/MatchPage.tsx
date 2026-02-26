@@ -61,7 +61,7 @@ export const MatchPage = () => {
 
         {/* Game Actions */}
         {!isSpectator && status === 'active' && (
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-4">
             <button
               onClick={offerDraw}
               className="btn-secondary flex-1 flex items-center justify-center gap-2 !py-2 text-sm"
@@ -70,7 +70,7 @@ export const MatchPage = () => {
             </button>
             <button
               onClick={resign}
-              className="flex-1 flex items-center justify-center gap-2 bg-accent-red/10 hover:bg-accent-red/20 text-accent-red rounded-md py-2 text-sm font-bold transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 bg-accent-red/10 hover:bg-accent-red/20 text-accent-red rounded-md py-2 text-sm font-bold transition-all hover:-translate-y-1 active:scale-95 shadow-[0_4px_0_0_rgba(224,40,40,0.2)] hover:shadow-[0_4px_0_0_rgba(224,40,40,0.3)] active:shadow-none active:translate-y-1"
             >
               <Flag size={16} /> Resign
             </button>
@@ -79,7 +79,7 @@ export const MatchPage = () => {
 
         {/* Spectator bar */}
         {isSpectator && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-surface-300 rounded-md text-sm text-text-muted">
+          <div className="flex items-center gap-2 px-3 py-2 bg-surface-300 rounded-md text-sm text-text-muted mt-4">
             <Eye size={14} />
             <span>Spectating • {spectatorCount} viewers</span>
           </div>
@@ -87,7 +87,7 @@ export const MatchPage = () => {
 
         {/* Game Over Banner */}
         {status === 'completed' && (
-          <div className="card p-4 border border-accent-green/30 text-center space-y-3">
+          <div className="card p-4 border border-accent-green/30 text-center space-y-3 mt-4 animate-slide-up">
             <div className="text-lg font-bold">
               {result === '1-0' ? 'White wins!' : result === '0-1' ? 'Black wins!' : 'Draw!'}
             </div>

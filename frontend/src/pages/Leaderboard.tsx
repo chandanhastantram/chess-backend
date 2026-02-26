@@ -1,15 +1,26 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Trophy, Medal, Crown, ChevronUp, ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+const fadeUp = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0, 0, 0.2, 1] as const } }
+};
+const podiumIn = {
+  hidden: { opacity: 0, scale: 0.5, y: 30 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 20 } }
+};
 
 export const Leaderboard = () => {
   const [leaders, setLeaders] = useState<any[]>([]);
-  const [tab, setTab] = useState<'daily' | 'bullet' | 'blitz' | 'rapid'>('blitz');
+  const [tab, setTab] = useState<'bullet' | 'blitz' | 'rapid' | 'classical'>('blitz');
 
   useEffect(() => {
     const fetchLeaders = async () => {
       try {
-        const res = await api.get(`/leaderboard?category=${tab}`);
+        const res = await api.get(`/leaderboard?time_control=${tab}`);
         setLeaders(res.data);
       } catch {
         setLeaders([
@@ -30,41 +41,59 @@ export const Leaderboard = () => {
   }, [tab]);
 
   const tabs = [
-    { id: 'daily', label: 'Daily' },
     { id: 'bullet', label: 'Bullet' },
     { id: 'blitz', label: 'Blitz' },
     { id: 'rapid', label: 'Rapid' },
+    { id: 'classical', label: 'Classical' },
   ] as const;
 
   return (
     <div className="min-h-[calc(100vh-48px)] bg-surface-100 p-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 mb-6"
+      >
         <Trophy size={28} className="text-accent-orange" />
         <h1 className="text-2xl font-bold">Leaderboard</h1>
-      </div>
+      </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-surface-300 p-1 rounded-md mb-6 w-fit">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex gap-1 bg-surface-300 p-1 rounded-md mb-6 w-fit"
+      >
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-5 py-2 rounded text-sm font-bold transition-colors ${
+            className={`px-5 py-2 rounded text-sm font-bold transition-all ${
               tab === t.id
-                ? 'bg-accent-green text-white'
-                : 'text-text-muted hover:text-text'
+                ? 'bg-accent-green text-white shadow-md'
+                : 'text-text-muted hover:text-text hover:bg-surface-400'
             }`}
           >
             {t.label}
           </button>
         ))}
-      </div>
+      </motion.div>
 
-      {/* Top 3 */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      {/* Top 3 Podium */}
+      <motion.div
+        className="grid grid-cols-3 gap-4 mb-6"
+        initial="hidden" animate="show" variants={stagger}
+        key={tab}
+      >
         {leaders.slice(0, 3).map((p, i) => (
-          <div key={p.username} className={`card p-5 text-center ${i === 0 ? 'border border-accent-orange/30' : ''}`}>
+          <motion.div
+            key={p.username}
+            variants={podiumIn}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            className={`card p-5 text-center cursor-pointer ${i === 0 ? 'border border-accent-orange/30' : ''}`}
+          >
             <div className="flex justify-center mb-3">
               {i === 0 ? <Crown size={32} className="text-accent-orange" /> :
                i === 1 ? <Medal size={28} className="text-text-muted" /> :
@@ -79,12 +108,16 @@ export const Leaderboard = () => {
               {p.change > 0 ? <ChevronUp size={14} /> : p.change < 0 ? <ChevronDown size={14} /> : null}
               {p.change > 0 ? '+' : ''}{p.change}
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Full Table */}
-      <div className="card overflow-hidden">
+      <motion.div
+        className="card overflow-hidden"
+        initial="hidden" animate="show" variants={stagger}
+        key={`table-${tab}`}
+      >
         <table className="w-full">
           <thead>
             <tr className="bg-surface-400 text-xs font-bold text-text-dim uppercase tracking-wider">
@@ -97,8 +130,12 @@ export const Leaderboard = () => {
             </tr>
           </thead>
           <tbody>
-            {leaders.map((p) => (
-              <tr key={p.username} className="border-t border-surface-200 hover:bg-surface-400/50 transition-colors">
+            {leaders.map((p, idx) => (
+              <tr
+                key={p.username}
+                className="border-t border-surface-200 hover:bg-surface-400/50 transition-colors cursor-pointer animate-fade-in-up"
+                style={{ animationDelay: `${idx * 60}ms` }}
+              >
                 <td className="px-4 py-3 font-bold text-text-dim">{p.rank}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
@@ -126,7 +163,7 @@ export const Leaderboard = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </motion.div>
     </div>
   );
 };
